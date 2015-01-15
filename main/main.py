@@ -1,9 +1,15 @@
 from utils import files
-
-f = files.fileutils()
+from basic import spatial,io
 
 def main():
-    print f.filelist('/home/nelson/Desktop','.tgz')
+    f = files.fileutils()
+    s = spatial.spatial()
+    i = io.io()
 
+    filelist = f.filelist('.jpg','/hdd/Pictures')
+
+    for ofile in filelist:
+       rotated = s.rotation(ofile)
+       i.show(rotated)
 if __name__ == '__main__':
     main()
