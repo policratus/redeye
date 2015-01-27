@@ -8,7 +8,7 @@ class io():
         try:
             image.save(filepath)
         except Exception, e:
-            print 'Erro saving file: {0}'.format(e)
+            print '[IO] Error saving file: {0}'.format(e)
 
     def show(self,image):
         image.show()
