@@ -19,7 +19,7 @@ clean:
 	find . -type d -iname 'build' -exec rm -rf {} +
 
 requirements:
-	pip install -q -r requirements.txt
+	pip install -q -r setup/requirements.txt
 
 install:
-	python setup.py
+	python setup/setup.py
