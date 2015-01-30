@@ -1,4 +1,6 @@
 help:
+	@echo ''
+	@echo ''
 	@echo '  /__\ ___  __| | ___ _   _  ___ '
 	@echo ' / \/// _ \/ _` |/ _ \ | | |/ _ \\'
 	@echo '/ _  \  __/ (_| |  __/ |_| |  __/'
@@ -12,7 +14,7 @@ help:
 	@echo 'Options:'
 	@echo 'clean - Remove any artifacts'
 	@echo 'requirements - Install all dependencies'
-	@echo 'redeye - Run Redeye'
+	@echo 'build - Build Redeye project'
 
 clean:
 	find . -iname '*.pyc' -exec rm -f {} +
@@ -23,3 +25,6 @@ requirements:
 
 install:
 	python setup/setup.py
+
+build:
+	python setup/setup.py build
