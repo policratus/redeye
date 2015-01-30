@@ -8,7 +8,7 @@ class parser():
                 help='Path for image files')
 
         psh.add_argument('--colorspace',
-                help='Perform operations on colorspace of images.',
+                help='Perform operations on color space of images',
                 metavar='space')
 
         psh.add_argument('--resize',
@@ -18,7 +18,7 @@ class parser():
                 nargs=2)
 
         psh.add_argument('--rotate',
-                help='Rotate the image (in degrees)',
+                help='Rotate the image (using degrees of rotation as input)',
                 metavar='degrees',
                 type=int)
 

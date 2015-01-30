@@ -15,6 +15,7 @@ help:
 	@echo 'clean - Remove any artifacts'
 	@echo 'requirements - Install all dependencies'
 	@echo 'build - Build Redeye project'
+	@echo 'usage - Show help'
 
 clean:
 	find . -iname '*.pyc' -exec rm -f {} +
@@ -28,3 +29,6 @@ install:
 
 build:
 	python setup/setup.py build
+
+usage:
+	python main/main.py -h
