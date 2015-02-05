@@ -1,6 +1,6 @@
 from PIL import Image
 
-class io():
+class io:
     def open(self,filepath):
         return Image.open(filepath)
 
