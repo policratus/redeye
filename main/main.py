@@ -31,6 +31,8 @@ def main():
                         ))
                 elif args.hist:
                     s.histogram(image,ofile)
+                elif args.negative:
+                    i.save(s.negative(image),ofile)
 
     except Exception, e:
         print '[MAIN]: {0}'.format(e)

@@ -39,6 +39,10 @@ class parser():
                 help='Return the histogram of a greyscale convertion',
                 action='store_true')
 
+        psh.add_argument('--negative',
+                help='Generate inverted (negative) images',
+                action='store_true')
+
         fargs = psh.parse_args()
 
         return fargs
