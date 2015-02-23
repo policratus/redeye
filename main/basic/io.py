@@ -1,14 +1,16 @@
 from PIL import Image
 
+
 class io():
-    def open(self,filepath):
+
+    def open(self, filepath):
         return Image.open(filepath)
 
-    def save(self,image,filepath):
+    def save(self, image, filepath):
         try:
             image.save(filepath)
-        except Exception, e:
+        except Exception as e:
             print '[IO] Error saving file: {0}'.format(e)
 
-    def show(self,image):
+    def show(self, image):
         image.show()

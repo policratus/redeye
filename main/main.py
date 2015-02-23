@@ -1,6 +1,7 @@
 from utils import files
-from basic import spatial,io
+from basic import spatial, io
 from shellparser import parser
+
 
 def main():
     f = files.fileutils()
@@ -11,28 +12,30 @@ def main():
     args = p.constructparser()
 
     try:
-        filelist = f.filelist('.jpg',args.path)
+        filelist = f.filelist('.jpg', args.path)
 
         if filelist:
             for ofile in filelist:
                 image = i.open(ofile)
 
                 if args.colorspace:
-                    i.save(s.colorspace(image,args.colorspace,size=2),ofile)
+                    i.save(s.colorspace(image, args.colorspace, size=2), ofile)
                 elif args.resize:
-                    i.save(s.resize(image,args.resize[0],args.resize[1]),ofile)
+                    i.save(
+                        s.resize(image, args.resize[0], args.resize[1]), ofile)
                 elif args.rotate:
-                    i.save(s.rotation(image,args.rotate),ofile)
+                    i.save(s.rotation(image, args.rotate), ofile)
                 elif args.thumbs:
-                    i.save(s.thumbs(image,args.thumbs[0],args.thumbs[1]),ofile)
+                    i.save(
+                        s.thumbs(image, args.thumbs[0], args.thumbs[1]), ofile)
                 elif args.crop:
-                    i.show(s.crop(image,args.crop[0],args.crop[1],
-                        args.crop[2],args.crop[3]
-                        ))
+                    i.show(s.crop(image, args.crop[0], args.crop[1],
+                                  args.crop[2], args.crop[3]
+                                  ))
                 elif args.hist:
-                    s.histogram(image,ofile)
+                    s.histogram(image, ofile)
 
-    except Exception, e:
+    except Exception as e:
         print '[MAIN]: {0}'.format(e)
 
 if __name__ == '__main__':
