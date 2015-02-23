@@ -49,7 +49,7 @@ class spatial():
 
         savefig(filepath)
 
-    def negative(self,image):
+    def negative(self, image):
         imarr = array(image)
 
         imarr = 255 - imarr

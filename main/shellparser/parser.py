@@ -42,8 +42,8 @@ class parser():
                          action='store_true')
 
         psh.add_argument('--negative',
-                help='Generate inverted (negative) images',
-                action='store_true')
+                         help='Generate inverted (negative) images',
+                         action='store_true')
 
         fargs = psh.parse_args()
 
