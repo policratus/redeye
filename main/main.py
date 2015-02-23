@@ -33,7 +33,13 @@ def main():
                                   args.crop[2], args.crop[3]
                                   ))
                 elif args.hist:
+<<<<<<< HEAD
                     s.histogram(image, ofile)
+=======
+                    s.histogram(image,ofile)
+                elif args.negative:
+                    i.save(s.negative(image),ofile)
+>>>>>>> 6a8c3c1a9eb99ce2cd9cda1d790f4f658f06ad4b
 
     except Exception as e:
         print '[MAIN]: {0}'.format(e)

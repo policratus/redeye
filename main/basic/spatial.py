@@ -48,3 +48,10 @@ class spatial():
         xlim([0, 255])
 
         savefig(filepath)
+
+    def negative(self,image):
+        imarr = array(image)
+
+        imarr = 255 - imarr
+
+        return Image.fromarray(imarr)
