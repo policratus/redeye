@@ -1,0 +1,64 @@
+#! /usr/bin/env python
+"""
+Redeye - A computer vision tool
+"""
+from basic import io, image
+from shellparser import parser
+
+def main():
+    """
+    Main caller for shell
+    """
+    image_io = io.ImageIO()
+    image_basic = image.BasicImage()
+    parse = parser.Parser()
+
+    args = parse.construct_parser()
+    files_io = io.BasicFilesIO(args.path)
+
+    try:
+        file_list = files_io.file_list()
+
+        for ofile in file_list:
+            im_obj = image_io.open_image(ofile)
+
+            if args.colorspace:
+                image_io.save(
+                    image_basic.colorspace(im_obj, args.colorspace, size=2),
+                    ofile
+                )
+            elif args.resize:
+                image_io.save(
+                    image_basic.resize(
+                        im_obj, args.resize[0],
+                        args.resize[1]),
+                    ofile
+                )
+            elif args.rotate:
+                image_io.save(image_basic.rotation(im_obj, args.rotate), ofile)
+            elif args.thumbs:
+                image_io.save(
+                    image_basic.thumbs(
+                        im_obj, args.thumbs[0], args.thumbs[1]
+                    ),
+                    ofile
+                )
+            elif args.crop:
+                image_io.show(
+                    image_basic.crop(
+                        im_obj, (
+                            args.crop[0], args.crop[1],
+                            args.crop[2], args.crop[3]
+                        )
+                    )
+                )
+            elif args.hist:
+                image_basic.histogram(im_obj, ofile)
+            elif args.negative:
+                image_io.save(image_basic.negative(im_obj), ofile)
+
+    except IOError as io_error:
+        print '[MAIN]: {0}'.format(io_error)
+
+if __name__ == '__main__':
+    main()

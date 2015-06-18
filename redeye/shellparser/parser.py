@@ -1,9 +1,18 @@
+"""
+Contains parsing for shell arguments
+"""
 import argparse
 
 
-class parser():
-
-    def constructparser(self):
+class Parser(object):
+    """
+    Methods for shell parsing
+    """
+    @staticmethod
+    def construct_parser():
+        """
+        Construct parsers for arguments
+        """
         psh = argparse.ArgumentParser()
 
         psh.add_argument('path',
@@ -21,12 +30,14 @@ class parser():
                          nargs=2)
 
         psh.add_argument('--rotate',
-                         help='Rotate the image (using degrees of rotation as input)',
+                         help='Rotate the image \
+                         (using degrees of rotation as input)',
                          metavar='degrees',
                          type=int)
 
         psh.add_argument('--thumbs',
-                         help='Create thumbnails (smaller than actual image size)',
+                         help='Create thumbnails \
+                         (smaller than actual image size)',
                          metavar='pixels',
                          type=int,
                          nargs=2)
