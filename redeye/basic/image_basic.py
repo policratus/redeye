@@ -1,8 +1,8 @@
 """
 Contains spatial, high level transforms and utils
 """
-from PIL import Image
-from numpy import array
+from PIL import Image, ImageFilter
+import numpy as np
 import matplotlib.pyplot as plt
 from basic import io
 
@@ -30,23 +30,23 @@ class BasicImage(io.ImageIO):
         return resized
 
     @staticmethod
-    def colorspace(image, space, size=16):
+    def color_space(image, space, size=16):
         """
         Change image to grey or its color space
         """
         if space == 'greyscale':
-            newspace = image.convert('L')
+            new_space = image.convert('L')
         elif space == 'color':
-            newspace = image.convert(
+            new_space = image.convert(
                 'P',
                 dither=Image.NONE,
-                colors=size,
-                palette=Image.ADAPTIVE
+                palette=Image.ADAPTIVE,
+                colors=size
             ).convert('RGB')
         else:
-            newspace = None
+            new_space = None
 
-        return newspace
+        return new_space
 
     @staticmethod
     def thumbs(image, width, height):
@@ -75,11 +75,9 @@ class BasicImage(io.ImageIO):
         Generates a image histogram
         """
         file_io = io.BasicFilesIO(path)
-        image = array(self.colorspace(image, 'greyscale'))
+        image = self.to_array(self.color_space(image, 'greyscale'))
 
-        data, bins, patches = plt.hist(image.flatten(), 51)
-        print '#### Histogram Data ###'
-        print 'Data:\n', data, '\n Bins: \n', bins, '\n Patches: \n', patches
+        _, _, _ = plt.hist(image.flatten(), 51)
         plt.title('Histogram of pixel intensity')
         plt.xlabel('Pixel intensity')
         plt.ylabel('Frequency')
@@ -92,13 +90,65 @@ class BasicImage(io.ImageIO):
             format='png'
         )
 
-    @staticmethod
-    def negative(image):
+    def negative(self, image):
         """
-        Invert values of colorspace
+        Invert values of color_space
         """
-        imarr = array(image)
+        imarr = self.to_array(image)
 
         imarr = 255 - imarr
 
         return Image.fromarray(imarr)
+
+    @staticmethod
+    def channel_lim(value):
+        """
+        Convert a RGB value from 0-255 to
+        0-1 range
+        """
+        return value / 255
+
+    @staticmethod
+    def to_array(image):
+        """
+        Convert a PIL Image object
+        to numpy array
+        """
+        return np.array(image)
+
+class FilterImage(BasicImage):
+    """
+    Encapsulates basic filters
+    """
+    def histogram_equalization(self, image):
+        """
+        Perform a histogram equalization
+        """
+        image_array = self.to_array(self.color_space(image, 'greyscale'))
+        image_array_flat = image_array.flatten()
+
+        im_histogram, bins = np.histogram(image_array_flat)
+
+        norm_cumulative_dist = 255 * im_histogram.cumsum() \
+            / im_histogram.cumsum()[-1]
+
+        equalized_image = np.interp(
+            image_array_flat,
+            bins[:-1],
+            norm_cumulative_dist
+        )
+
+        equalized_image = equalized_image.reshape(image_array.shape)
+
+        return Image.fromarray(equalized_image)
+
+    def gaussian(self, image):
+        """
+        Applies a Gaussian filter
+        """
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+
+        gauss = ImageFilter.GaussianBlur()
+
+        return image.filter(gauss)

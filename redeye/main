@@ -2,15 +2,18 @@
 """
 Redeye - A computer vision tool
 """
-from basic import io, image
+from basic import io, image_basic
+from features import extraction
 from shellparser import parser
+
 
 def main():
     """
     Main caller for shell
     """
     image_io = io.ImageIO()
-    image_basic = image.BasicImage()
+    image_basis = image_basic.BasicImage()
+    extractor = extraction.ExtractFeaturesImage()
     parse = parser.Parser()
 
     args = parse.construct_parser()
@@ -24,28 +27,28 @@ def main():
 
             if args.colorspace:
                 image_io.save(
-                    image_basic.colorspace(im_obj, args.colorspace, size=2),
+                    image_basis.color_space(im_obj, args.colorspace, size=2),
                     ofile
                 )
             elif args.resize:
                 image_io.save(
-                    image_basic.resize(
+                    image_basis.resize(
                         im_obj, args.resize[0],
                         args.resize[1]),
                     ofile
                 )
             elif args.rotate:
-                image_io.save(image_basic.rotation(im_obj, args.rotate), ofile)
+                image_io.save(image_basis.rotation(im_obj, args.rotate), ofile)
             elif args.thumbs:
                 image_io.save(
-                    image_basic.thumbs(
+                    image_basis.thumbs(
                         im_obj, args.thumbs[0], args.thumbs[1]
                     ),
                     ofile
                 )
             elif args.crop:
                 image_io.show(
-                    image_basic.crop(
+                    image_basis.crop(
                         im_obj, (
                             args.crop[0], args.crop[1],
                             args.crop[2], args.crop[3]
@@ -53,9 +56,15 @@ def main():
                     )
                 )
             elif args.hist:
-                image_basic.histogram(im_obj, ofile)
+                image_basis.histogram(im_obj, ofile)
             elif args.negative:
-                image_io.save(image_basic.negative(im_obj), ofile)
+                image_io.save(image_basis.negative(im_obj), ofile)
+            elif args.dominant_colors:
+                print ofile
+                extractor.dominant_colors(im_obj, args.dominant_colors)
+            elif args.dominant_colors_tuna:
+                print ofile
+                extractor.dominant_colors_tuna(im_obj, args.dominant_colors_tuna)
 
     except IOError as io_error:
         print '[MAIN]: {0}'.format(io_error)

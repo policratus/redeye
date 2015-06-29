@@ -77,7 +77,7 @@ class BasicFilesIO(BasicIO):
             print 'System error: {0}'.format(os_error)
 
     @staticmethod
-    def change_name(file_path, prefix='', suffix= '', extension=''):
+    def change_name(file_path, prefix='', suffix='', extension=''):
         """
         Change the name of a file
         contained in strings
