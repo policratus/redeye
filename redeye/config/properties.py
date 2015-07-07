@@ -1,6 +1,7 @@
 """
 Wrapper for configuration and properties files
 """
+import os
 from ConfigParser import SafeConfigParser
 
 
@@ -8,7 +9,7 @@ class Properties(object):
     """
     Handles configuration and properties
     """
-    path = '/home/policratus/git/redeye/redeye/config/redeye.config'
+    path = os.path.dirname(os.path.realpath(__file__)) + '/redeye.config'
 
     def __init__(self, key):
         """
