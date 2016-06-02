@@ -77,7 +77,7 @@ class BasicImage(io.ImageIO):
         file_io = io.BasicFilesIO(path)
         image = self.to_array(self.color_space(image, 'greyscale'))
 
-        _, _, _ = plt.hist(image.flatten(), 51)
+        plt.hist(image.flatten(), 51)
         plt.title('Histogram of pixel intensity')
         plt.xlabel('Pixel intensity')
         plt.ylabel('Frequency')
@@ -89,6 +89,7 @@ class BasicImage(io.ImageIO):
             ),
             format='png'
         )
+        plt.clf()
 
     def negative(self, image):
         """
