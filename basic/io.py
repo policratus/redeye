@@ -33,14 +33,6 @@ class BasicFilesIO(BasicIO):
     """
     File utilities
     """
-    def __init__(self, path):
-        """
-        Defines a working_dir
-        """
-        self.working_dir = ''
-
-        if os.path.exists(path):
-            self.working_dir = path
 
     @staticmethod
     def absolute_path(file_name, path):
@@ -49,16 +41,19 @@ class BasicFilesIO(BasicIO):
         """
         return os.path.join(file_name, path)
 
-    def file_list(self):
+    def file_list(self, path):
         """
         Creates a file list from a determined path
         """
+        if os.path.exists(path):
+            working_dir = path
+
         config = properties.Properties('Image')
         files = []
 
         try:
-            if self.working_dir:
-                for file_dir in self.ls_dir(self.working_dir):
+            if working_dir:
+                for file_dir in self.ls_dir(working_dir):
                     if file_dir.endswith(
                             tuple(
                                 config.multi_value(
@@ -68,7 +63,7 @@ class BasicFilesIO(BasicIO):
                     ):
                         files.append(
                             self.absolute_path(
-                                self.working_dir, file_dir
+                                working_dir, file_dir
                             )
                         )
 
@@ -87,7 +82,7 @@ class BasicFilesIO(BasicIO):
 
         return path + '/' + prefix + file_name + suffix + '.' + extension
 
-class ImageIO(object):
+class ImageIO(BasicFilesIO):
     """
     Basic image operations
     """
@@ -124,11 +119,11 @@ class ImageIO(object):
         """
         Open images in batch and append it to a list
         """
-        files_io = BasicFilesIO(path)
+        files_io = BasicFilesIO()
         config = properties.Properties('Image')
         max_open_image_files = int(config.section('MaxBatchImageOpen'))
 
-        files = files_io.file_list()
+        files = files_io.file_list(path)
 
         for image_file in files[:max_open_image_files]:
             self.images.append(self.open_image(image_file))
