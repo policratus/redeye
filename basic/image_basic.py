@@ -74,15 +74,14 @@ class BasicImage(io.ImageIO):
         """
         Generates a image histogram
         """
-        file_io = io.BasicFilesIO(path)
         image = self.to_array(self.color_space(image, 'greyscale'))
 
-        plt.hist(image.flatten(), 51)
+        plt.hist(image.flatten(), 52)
         plt.title('Histogram of pixel intensity')
         plt.xlabel('Pixel intensity')
         plt.ylabel('Frequency')
         plt.savefig(
-            file_io.change_name(
+            self.change_name(
                 path,
                 prefix='histogram-',
                 extension='png'
@@ -143,7 +142,25 @@ class FilterImage(BasicImage):
 
         return Image.fromarray(equalized_image)
 
-    def gaussian(self, image):
+    def polynomial_graylevel_transform(self, image, degree=2):
+        """
+        Transform the graylevel information on the image,
+        applying a polynomial transformation, which turns
+        dark pixels darker.
+
+        Parameters
+        ----------
+        degree : int
+            Degree used to transform the image polynomially
+        """
+        if isinstance(degree, int):
+            image = self.color_space(image, 'greyscale')
+            imarr = self.to_array(image)
+
+            return self.color_space(Image.fromarray(255.0 * (imarr / 255.0) ** degree), 'greyscale')
+
+    @staticmethod
+    def gaussian(image):
         """
         Applies a Gaussian filter
         """

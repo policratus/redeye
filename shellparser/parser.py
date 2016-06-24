@@ -59,8 +59,8 @@ class Parser(object):
         )
 
         psh.add_argument(
-            '--hist',
-            help='Return the histogram of a greyscale convertion',
+            '--histogram',
+            help='Return the histogram of a greyscale conversion',
             action='store_true'
         )
 
@@ -68,6 +68,13 @@ class Parser(object):
             '--negative',
             help='Generate inverted (negative) images',
             action='store_true'
+        )
+
+        psh.add_argument(
+            '--darken_dark_pixels',
+            help='Uses a polynomial to turn more dark pixels darker. The level can be chosen.',
+            metavar='level',
+            type=int
         )
 
         psh.add_argument(

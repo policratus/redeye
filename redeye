@@ -2,7 +2,7 @@
 """
 Redeye - A computer vision tool
 """
-from basic import io, image_basic
+from basic import image_basic
 from features import extraction
 from shellparser import parser
 
@@ -11,43 +11,42 @@ def main():
     """
     Main caller for shell
     """
-    image_io = io.ImageIO()
     image_basis = image_basic.BasicImage()
+    filter_basis = image_basic.FilterImage()
     extractor = extraction.ExtractFeaturesImage()
     parse = parser.Parser()
 
     args = parse.construct_parser()
-    files_io = io.BasicFilesIO(args.path)
 
-    try:
-        file_list = files_io.file_list()
+    file_list = image_basis.file_list(args.path)
 
-        for ofile in file_list:
-            im_obj = image_io.open_image(ofile)
+    for ofile in file_list:
+        im_obj = image_basis.open_image(ofile)
 
+        if im_obj:
             if args.colorspace:
-                image_io.save(
+                image_basis.save(
                     image_basis.color_space(im_obj, args.colorspace, size=2),
                     ofile
                 )
             elif args.resize:
-                image_io.save(
+                image_basis.save(
                     image_basis.resize(
                         im_obj, args.resize[0],
                         args.resize[1]),
                     ofile
                 )
             elif args.rotate:
-                image_io.save(image_basis.rotation(im_obj, args.rotate), ofile)
+                image_basis.save(image_basis.rotation(im_obj, args.rotate), ofile)
             elif args.thumbs:
-                image_io.save(
+                image_basis.save(
                     image_basis.thumbs(
                         im_obj, args.thumbs[0], args.thumbs[1]
                     ),
                     ofile
                 )
             elif args.crop:
-                image_io.show(
+                image_basis.show(
                     image_basis.crop(
                         im_obj, (
                             args.crop[0], args.crop[1],
@@ -55,19 +54,20 @@ def main():
                         )
                     )
                 )
-            elif args.hist:
+            elif args.histogram:
                 image_basis.histogram(im_obj, ofile)
             elif args.negative:
-                image_io.save(image_basis.negative(im_obj), ofile)
+                image_basis.save(image_basis.negative(im_obj), ofile)
+            elif args.darken_dark_pixels:
+                filter_basis.polynomial_graylevel_transform(
+                    im_obj, args.darken_dark_pixels
+                ).save(ofile)
             elif args.dominant_colors:
                 print ofile
                 extractor.dominant_colors(im_obj, args.dominant_colors)
             elif args.dominant_colors_tuna:
                 print ofile
                 extractor.dominant_colors_tuna(im_obj, args.dominant_colors_tuna)
-
-    except IOError as io_error:
-        print '[MAIN]: {0}'.format(io_error)
 
 if __name__ == '__main__':
     main()
