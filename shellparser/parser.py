@@ -27,11 +27,13 @@ class Parser(object):
             metavar='space'
         )
 
-        psh.add_argument('--resize',
-                         help='Resize the image',
-                         metavar='pixels',
-                         type=int,
-                         nargs=2)
+        psh.add_argument(
+            '--resize',
+            help='Resize the image',
+            metavar='pixels',
+            type=int,
+            nargs=2
+        )
 
         psh.add_argument(
             '--rotate',
@@ -61,6 +63,19 @@ class Parser(object):
         psh.add_argument(
             '--histogram',
             help='Return the histogram of a greyscale conversion',
+            action='store_true'
+        )
+
+        psh.add_argument(
+            '--histogram_equalization',
+            help='Execute a histogram equalization on a greyscale image',
+            action='store_true'
+        )
+
+        psh.add_argument(
+            '--save_histogram_equalization',
+            help='Similar to --histogram_equalization, but export the histograms' \
+                 'before and after transformations',
             action='store_true'
         )
 

@@ -56,6 +56,10 @@ def main():
                 )
             elif args.histogram:
                 image_basis.histogram(im_obj, ofile)
+            elif args.histogram_equalization:
+                filter_basis.execute_histogram_equalization(im_obj).save(ofile)
+            elif args.save_histogram_equalization:
+                filter_basis.save_histogram_equalization(ofile)
             elif args.negative:
                 image_basis.save(image_basis.negative(im_obj), ofile)
             elif args.darken_dark_pixels:

@@ -70,7 +70,7 @@ class BasicImage(io.ImageIO):
 
         return region
 
-    def histogram(self, image, path):
+    def histogram(self, image, path, file_prefix='histogram'):
         """
         Generates a image histogram
         """
@@ -83,7 +83,7 @@ class BasicImage(io.ImageIO):
         plt.savefig(
             self.change_name(
                 path,
-                prefix='histogram-',
+                prefix=file_prefix + '-',
                 extension='png'
             ),
             format='png'
@@ -120,9 +120,13 @@ class FilterImage(BasicImage):
     """
     Encapsulates basic filters
     """
-    def histogram_equalization(self, image):
+    def execute_histogram_equalization(self, image):
         """
         Perform a histogram equalization
+
+        Parameters
+        ----------
+        image: PIL Image Object
         """
         image_array = self.to_array(self.color_space(image, 'greyscale'))
         image_array_flat = image_array.flatten()
@@ -140,7 +144,28 @@ class FilterImage(BasicImage):
 
         equalized_image = equalized_image.reshape(image_array.shape)
 
-        return Image.fromarray(equalized_image)
+        return self.color_space(Image.fromarray(equalized_image), 'greyscale')
+
+    def save_histogram_equalization(self, path):
+        """
+        Executes an histogram equalization on the Greyscale level
+        and export the histograms before and after transformation
+
+        Parameters
+        ----------
+        image: PIL Image Object
+        path: str
+            Path of image to be processed
+        """
+        image = Image.open(path)
+
+        self.histogram(image, path, 'histogram-before-equalization')
+
+        equalized_image = self.execute_histogram_equalization(image)
+
+        self.histogram(equalized_image, path, 'histogram-after-equalization')
+
+        self.save(equalized_image, path)
 
     def polynomial_graylevel_transform(self, image, degree=2):
         """
