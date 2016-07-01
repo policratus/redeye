@@ -16,7 +16,6 @@ class ExtractFeaturesImage(image_basic.FilterImage):
         if image.mode != 'RGB':
             image = image.convert('RGB')
 
-        pixel_values = []
         cluster = 0
 
         kmeans = KMeans(number_of_colors)
@@ -25,13 +24,13 @@ class ExtractFeaturesImage(image_basic.FilterImage):
 
         image_array = self.to_array(image)
 
-        for line in image_array:
-            for pixel in line:
-                pixel_values.append(pixel)
-
-        pixel_values = self.to_array(pixel_values)
-
-        kmeans.fit(pixel_values)
+        kmeans.fit(
+            [
+                pixel
+                for pixel_line in image_array
+                for pixel in pixel_line
+            ]
+        )
 
         centers = kmeans.cluster_centers_
 
@@ -43,10 +42,3 @@ class ExtractFeaturesImage(image_basic.FilterImage):
                 cluster_num=cluster,
                 RGB=color
             )
-
-    def dominant_colors_tuna(self, image, number_of_colors=3):
-        image = self.crop(image, (2, 2, image.size[0]-2, image.size[1]-2))
-
-        image = self.gaussian(image)
-
-        self.dominant_colors(image, number_of_colors)

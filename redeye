@@ -69,9 +69,6 @@ def main():
             elif args.dominant_colors:
                 print ofile
                 extractor.dominant_colors(im_obj, args.dominant_colors)
-            elif args.dominant_colors_tuna:
-                print ofile
-                extractor.dominant_colors_tuna(im_obj, args.dominant_colors_tuna)
 
 if __name__ == '__main__':
     main()
