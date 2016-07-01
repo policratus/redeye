@@ -99,13 +99,6 @@ class Parser(object):
             type=int
         )
 
-        psh.add_argument(
-            '--dominant_colors_tuna',
-            help='Return the dominant colors suited to TUNA corpus database',
-            metavar='colors',
-            type=int
-        )
-
         fargs = psh.parse_args()
 
         return fargs
