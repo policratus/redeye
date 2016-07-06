@@ -99,6 +99,12 @@ class Parser(object):
             type=int
         )
 
+        psh.add_argument(
+            '--simple_mean_image',
+            help='Generate a mean picture from a image database',
+            action='store_true'
+        )
+
         fargs = psh.parse_args()
 
         return fargs
