@@ -109,12 +109,26 @@ class BasicImage(io.ImageIO):
         return value / 255
 
     @staticmethod
-    def to_array(image):
+    def to_array(image, array_type='uint8'):
         """
         Convert a PIL Image object
         to numpy array
+
+        Parameters
+        ----------
+        image: PIL Image Object
+            An instance of a image object from PIL module
+        array_type: str
+            Numpy type for the array
         """
-        return np.array(image)
+        return np.array(image, array_type)
+
+    @staticmethod
+    def from_array(image_array):
+        """
+        Convert a numpy array to a PIL Image Object
+        """
+        return Image.fromarray(image_array)
 
 class FilterImage(BasicImage):
     """
