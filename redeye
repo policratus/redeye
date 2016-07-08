@@ -21,6 +21,8 @@ def main():
 
     if args.simple_mean_image:
         extractor.simple_mean_image(args.path)
+    elif args.simple_eigen_images:
+        extractor.simple_eigen_images(args.path)
     else:
         file_list = image_basis.file_list(args.path)
 
