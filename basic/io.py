@@ -2,6 +2,7 @@
 Contains basic operations related to files, images, etc
 """
 import os
+import numpy
 from PIL import Image
 from config import properties
 
@@ -67,7 +68,10 @@ class BasicFilesIO(BasicIO):
                             )
                         )
 
-            return files
+            if files:
+                return files
+            else:
+                return None
         except OSError as os_error:
             print 'System error: {0}'.format(os_error)
 
@@ -137,3 +141,53 @@ class ImageIO(BasicFilesIO):
 
         for image in self.images:
             self.show(image)
+
+    @staticmethod
+    def array_to_image(array):
+        """
+        Converts a numpy array representing a
+        image to its bitmap representation
+
+        Parameters
+        ----------
+        array: numpy.ndarray
+            Array representing image
+        """
+        return Image.fromarray(array)
+
+    @staticmethod
+    def to_array(obj, array_type='uint8'):
+        """
+        Convert a object
+        to numpy array
+
+        Parameters
+        ----------
+        obj: Object
+            An instance of object which the conversion
+            is possible
+        array_type: str
+            Numpy type for the array
+        """
+        return numpy.array(obj, array_type)
+
+    @staticmethod
+    def append_arrays(arrays):
+        """
+        Appends two or more arrays
+
+        Parameters
+        ----------
+        arrays: tuple
+            A tuple containing two or more arrays
+            to append
+        """
+        if isinstance(arrays, tuple) and len(arrays) >= 2:
+            return numpy.concatenate(arrays)
+
+    @classmethod
+    def image_shape(cls, image):
+        """
+        Returns the shape (dimensions) of image
+        """
+        return cls.to_array(image).shape

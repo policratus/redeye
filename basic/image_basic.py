@@ -2,8 +2,8 @@
 Contains spatial, high level transforms and utils
 """
 from PIL import Image, ImageFilter
-import numpy as np
-import matplotlib.pyplot as plt
+import numpy
+import matplotlib.pyplot as plot
 from basic import io
 
 
@@ -76,11 +76,11 @@ class BasicImage(io.ImageIO):
         """
         image = self.to_array(self.color_space(image, 'greyscale'))
 
-        plt.hist(image.flatten(), 52)
-        plt.title('Histogram of pixel intensity')
-        plt.xlabel('Pixel intensity')
-        plt.ylabel('Frequency')
-        plt.savefig(
+        plot.hist(image.flatten(), 52)
+        plot.title('Histogram of pixel intensity')
+        plot.xlabel('Pixel intensity')
+        plot.ylabel('Frequency')
+        plot.savefig(
             self.change_name(
                 path,
                 prefix=file_prefix + '-',
@@ -88,7 +88,7 @@ class BasicImage(io.ImageIO):
             ),
             format='png'
         )
-        plt.clf()
+        plot.clf()
 
     def negative(self, image):
         """
@@ -98,7 +98,7 @@ class BasicImage(io.ImageIO):
 
         imarr = 255 - imarr
 
-        return Image.fromarray(imarr)
+        return self.array_to_image(imarr)
 
     @staticmethod
     def channel_lim(value):
@@ -109,26 +109,100 @@ class BasicImage(io.ImageIO):
         return value / 255
 
     @staticmethod
-    def to_array(image, array_type='uint8'):
+    def show_image_gallery(title, images, rows, columns, shape=()):
         """
-        Convert a PIL Image object
-        to numpy array
+        Plot or save two or more (processed) images
 
         Parameters
         ----------
-        image: PIL Image Object
-            An instance of a image object from PIL module
-        array_type: str
-            Numpy type for the array
+        title: str
+            Title of the plot (which will appear top centered)
+        images: numpy.ndarray
+            A numpy array containing image data
+        rows: int
+            Number of rows to plot
+        columns: int
+            Number of columns to plot
+        shape: tuple
+            A tuple containing the dimensions of image
+            (used for reshaping the array if it was flatten)
         """
-        return np.array(image, array_type)
+        plot.suptitle(title, size=30)
+
+        for index, image in enumerate(images):
+            if shape:
+                image = image.reshape(shape)
+
+            plot.subplot(rows, columns, index + 1)
+            luminosity_max = max(image.max(), -image.min())
+            plot.imshow(
+                image,
+                cmap=plot.cm.gray,
+                vmin=-luminosity_max,
+                vmax=luminosity_max
+            )
+
+            plot.xticks(())
+            plot.yticks(())
+
+        return plot
+
+    @classmethod
+    def save_image_gallery(cls, path, title, images, rows, columns, shape=(), prefix=''):
+        """
+        Saves a image gallery to disk
+
+        Parameters
+        ----------
+        path: str
+            Path which the gallery will be saved
+        title: str
+            Title of the plot (which will appear top centered)
+        images: numpy.ndarray
+            A numpy array containing image data
+        rows: int
+            Number of rows to plot
+        columns: int
+            Number of columns to plot
+        shape: tuple
+            A tuple containing the dimensions of image
+            (used for reshaping the array if it was flatten)
+        """
+        plot_to_save = cls.show_image_gallery(
+            title,
+            images,
+            rows,
+            columns,
+            shape
+        )
+
+        plot_to_save.savefig(
+            cls.change_name(
+                path,
+                prefix=prefix,
+                extension='png'
+            ),
+            format='png'
+        )
 
     @staticmethod
-    def from_array(image_array):
+    def flattened_images_centering(images_array):
         """
-        Convert a numpy array to a PIL Image Object
+        Centers (globally and locally) arrays containing
+        flattened image arrays (one dimensional)
+
+        Parameters
+        ----------
+        images_array: numpy.ndarray
+            A numpy array with arrays of flattened
+            images
         """
-        return Image.fromarray(image_array)
+        samples, _ = images_array.shape
+
+        images_array = images_array - images_array.mean(axis=0)
+        images_array -= images_array.mean(axis=1).reshape(samples, -1)
+
+        return images_array
 
 class FilterImage(BasicImage):
     """
@@ -145,12 +219,12 @@ class FilterImage(BasicImage):
         image_array = self.to_array(self.color_space(image, 'greyscale'))
         image_array_flat = image_array.flatten()
 
-        im_histogram, bins = np.histogram(image_array_flat)
+        im_histogram, bins = numpy.histogram(image_array_flat)
 
         norm_cumulative_dist = 255 * im_histogram.cumsum() \
             / im_histogram.cumsum()[-1]
 
-        equalized_image = np.interp(
+        equalized_image = numpy.interp(
             image_array_flat,
             bins[:-1],
             norm_cumulative_dist
@@ -158,7 +232,7 @@ class FilterImage(BasicImage):
 
         equalized_image = equalized_image.reshape(image_array.shape)
 
-        return self.color_space(Image.fromarray(equalized_image), 'greyscale')
+        return self.color_space(self.array_to_image(equalized_image), 'greyscale')
 
     def save_histogram_equalization(self, path):
         """
@@ -196,7 +270,9 @@ class FilterImage(BasicImage):
             image = self.color_space(image, 'greyscale')
             imarr = self.to_array(image)
 
-            return self.color_space(Image.fromarray(255.0 * (imarr / 255.0) ** degree), 'greyscale')
+            return self.color_space(
+                self.array_to_image(255.0 * (imarr / 255.0) ** degree), 'greyscale'
+            )
 
     @staticmethod
     def gaussian(image):
