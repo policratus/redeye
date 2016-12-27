@@ -105,6 +105,12 @@ class Parser(object):
             action='store_true'
         )
 
+        psh.add_argument(
+            '--simple_eigen_images',
+            help='Generate eigen images from a image database',
+            action='store_true'
+        )
+
         fargs = psh.parse_args()
 
         return fargs
