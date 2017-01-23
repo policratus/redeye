@@ -33,6 +33,19 @@ class BasicImage(io.ImageIO):
     def color_space(image, space, size=16):
         """
         Change image to grey or its color space
+
+        Parameters
+        ----------
+        image: A PIL image instance
+
+        space: str
+            If the space is shades of grey
+            or color (RGB). Can be 'greyscale'
+            or 'color'
+
+        size: int
+            Number of colors or shades of grey
+            to use
         """
         if space == 'greyscale':
             new_space = image.convert('L')
@@ -321,3 +334,54 @@ class FilterImage(BasicImage):
         gauss = ImageFilter.GaussianBlur()
 
         return image.filter(gauss)
+
+    @classmethod
+    def derivatives(cls, image, direction, algorithm, pre_blurring=False):
+        """
+        Calculates (greylevel) image derivatives,
+        optionally blurring the image before applying
+        derivative filters or choosing direction of
+        derivatives.
+
+        Parameters
+        ----------
+        image: A PIL image object
+
+        direction: str
+            Derivatives of which axis to calculate.
+            Can be 'x' or 'y'
+
+        algorithm: str
+            Which algorithm will calculate the derivatives.
+            Values can be 'sobel' or 'prewitt'
+
+        pre_blurring: bool
+            Apply or not a gaussian blurring filter
+            before calculating derivatives
+
+        """
+        from scipy.ndimage.filters import sobel, prewitt
+
+        convolution, derivatives = None, None
+
+        grey_image = cls.color_space(image, space='greyscale')
+
+        if pre_blurring:
+            grey_image = cls.gaussian(grey_image)
+
+        if algorithm == 'sobel':
+            convolution = sobel
+        elif algorithm == 'prewitt':
+            convolution = prewitt
+        else:
+            print 'Algorithm not yet implemented.'
+
+        if convolution:
+            if direction == 'x':
+                derivatives = convolution(grey_image, 1)
+            elif direction == 'y':
+                derivatives = convolution(grey_image, 0)
+            else:
+                print 'Direction axis not recognized'
+
+        return cls.array_to_image(derivatives)
