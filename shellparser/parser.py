@@ -93,6 +93,13 @@ class Parser(object):
         )
 
         psh.add_argument(
+            '--derivatives',
+            help='Calculate image derivatives on specified axis',
+            metavar='axis',
+            type=str
+        )
+
+        psh.add_argument(
             '--dominant_colors',
             help='Return the dominant colors',
             metavar='colors',
