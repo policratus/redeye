@@ -72,14 +72,9 @@ def main():
                     filter_basis.polynomial_graylevel_transform(
                         im_obj, args.darken_dark_pixels
                     ).save(ofile)
-                elif args.derivatives:
+                elif args.edges:
                     image_basis.save(
-                        filter_basis.derivatives(
-                            im_obj,
-                            args.derivatives,
-                            'prewitt',
-                            True
-                        ),
+                        filter_basis.detect_edges(im_obj),
                         ofile
                     )
                 elif args.dominant_colors:
