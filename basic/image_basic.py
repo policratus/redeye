@@ -288,9 +288,9 @@ class BasicImage(io.ImageIO):
 
         # If image is not grayscaled
         if image.mode != 'L':
-            grey_image = cls.color_space(image, space='greyscale')
+            image = cls.color_space(image, space='greyscale')
 
-        grey_image = cls.to_array(grey_image)
+        grey_image = cls.to_array(image)
 
         if pre_blurring:
             grey_image = bilateralFilter(
