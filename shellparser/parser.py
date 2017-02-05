@@ -93,10 +93,9 @@ class Parser(object):
         )
 
         psh.add_argument(
-            '--derivatives',
-            help='Calculate image derivatives on specified axis',
-            metavar='axis',
-            type=str
+            '--edges',
+            help='Detect edges on images',
+            action='store_true'
         )
 
         psh.add_argument(

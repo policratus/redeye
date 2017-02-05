@@ -4,6 +4,8 @@ Contains spatial, high level transforms and utils
 from PIL import Image, ImageFilter
 import numpy
 import matplotlib.pyplot as plot
+from cv2 import bilateralFilter
+from scipy.ndimage.filters import sobel, prewitt
 from basic import io
 
 
@@ -253,6 +255,95 @@ class BasicImage(io.ImageIO):
 
         return images_array
 
+    @classmethod
+    def derivatives(cls, image, direction, algorithm, pre_blurring=True):
+        """
+        Calculates (greylevel) image derivatives,
+        optionally blurring the image before applying
+        derivative filters or choosing direction of
+        derivatives.
+
+        Parameters
+        ----------
+        image: A PIL image object
+
+        direction: str
+            Derivatives of which axis to calculate.
+            Can be 'x' or 'y'
+
+        algorithm: str
+            Which algorithm will calculate the derivatives.
+            Values can be 'sobel' or 'prewitt'
+
+        pre_blurring: bool
+            Apply or not a bilateral blurring filter
+            (which blurs the images but tries to
+            preserve edges sharp) before calculating
+            derivatives. Note that by default, blurring
+            process is enabled (which return better
+            derivatives) but it's slower than without
+            blurring.
+        """
+        convolution, derivatives = None, None
+
+        # If image is not grayscaled
+        if image.mode != 'L':
+            image = cls.color_space(image, space='greyscale')
+
+        grey_image = cls.to_array(image)
+
+        if pre_blurring:
+            grey_image = bilateralFilter(
+                grey_image,
+                d=40,
+                sigmaColor=30,
+                sigmaSpace=200
+            )
+
+        # Converting array to int32 for more
+        # precise calculation of derivatives
+        grey_image = cls.to_array(grey_image, 'int32')
+
+        if algorithm == 'sobel':
+            convolution = sobel
+        elif algorithm == 'prewitt':
+            convolution = prewitt
+        else:
+            print 'Algorithm not yet implemented.'
+
+        if convolution:
+            if direction == 'x':
+                derivatives = convolution(grey_image, 0)
+            elif direction == 'y':
+                derivatives = convolution(grey_image, 1)
+            else:
+                print 'Direction axis not recognized'
+
+        return cls.array_to_image(derivatives)
+
+    @classmethod
+    def magnitude(cls, derivative_x, derivative_y):
+        """
+        Calculates magnitude between too (image) arrays
+
+        Parameters
+        ----------
+        derivative_x: numpy.ndarray
+            x-derivates of a image
+
+        derivative-y: numpy.ndarray
+            y-derivatives of a image
+        """
+        # Calculating the image gradient, that tells
+        # the direction of pixels from a low intensity
+        # (whithish) to a high intensity (darkened)
+        gradient = numpy.hypot(derivative_x, derivative_y)
+
+        # Normalization
+        magnitude = gradient * (255.0 / numpy.max(gradient))
+
+        return cls.array_to_image(magnitude)
+
 class FilterImage(BasicImage):
     """
     Encapsulates basic filters
@@ -336,52 +427,15 @@ class FilterImage(BasicImage):
         return image.filter(gauss)
 
     @classmethod
-    def derivatives(cls, image, direction, algorithm, pre_blurring=False):
+    def detect_edges(cls, image):
         """
-        Calculates (greylevel) image derivatives,
-        optionally blurring the image before applying
-        derivative filters or choosing direction of
-        derivatives.
-
-        Parameters
-        ----------
-        image: A PIL image object
-
-        direction: str
-            Derivatives of which axis to calculate.
-            Can be 'x' or 'y'
-
-        algorithm: str
-            Which algorithm will calculate the derivatives.
-            Values can be 'sobel' or 'prewitt'
-
-        pre_blurring: bool
-            Apply or not a gaussian blurring filter
-            before calculating derivatives
-
+        Analyze an image and detect edges on it
         """
-        from scipy.ndimage.filters import sobel, prewitt
+        x_derivatives = cls.derivatives(image, 'x', 'sobel')
+        y_derivatives = cls.derivatives(image, 'y', 'sobel')
 
-        convolution, derivatives = None, None
+        magnitude = cls.magnitude(x_derivatives, y_derivatives)
 
-        grey_image = cls.color_space(image, space='greyscale')
+        magnitude = cls.to_array(magnitude, 'uint8')
 
-        if pre_blurring:
-            grey_image = cls.gaussian(grey_image)
-
-        if algorithm == 'sobel':
-            convolution = sobel
-        elif algorithm == 'prewitt':
-            convolution = prewitt
-        else:
-            print 'Algorithm not yet implemented.'
-
-        if convolution:
-            if direction == 'x':
-                derivatives = convolution(grey_image, 1)
-            elif direction == 'y':
-                derivatives = convolution(grey_image, 0)
-            else:
-                print 'Direction axis not recognized'
-
-        return cls.array_to_image(derivatives)
+        return cls.array_to_image(magnitude)
