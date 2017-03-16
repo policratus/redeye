@@ -1,6 +1,7 @@
 """
 Contains classes for feature extraction
 """
+from cv2 import cornerHarris, dilate
 from sklearn import decomposition
 from sklearn.cluster import KMeans
 from basic import image_basic
@@ -164,3 +165,47 @@ class ExtractFeaturesImage(image_basic.FilterImage):
             )
         else:
             print 'No files found to generate eigen images'
+
+    def simple_corner_detection(self, image):
+        """
+        Detects corners using Harris corner detection
+        algorithm
+
+        Parameters
+        ----------
+        image: PIL Image object
+        """
+        if image.mode != 'RGB':
+            image = self.color_space(
+                image,
+                'color',
+                size=2**16
+            )
+
+        if image.mode != 'L':
+            gray_image = self.color_space(image, 'greyscale')
+        else:
+            gray_image = image
+
+        dilate_kernel = self.matrix_of_ns(5, 1)
+
+        dilated_image = dilate(
+            cornerHarris(
+                self.to_array(
+                    gray_image,
+                    array_type='float32'
+                ),
+                blockSize=2,
+                ksize=3,
+                k=0.04
+            ),
+            dilate_kernel
+        )
+
+        image = self.to_array(image)
+
+        image[
+            dilated_image > 0.05 * dilated_image.max()
+        ] = [255, 153, 51]
+
+        return self.array_to_image(image)

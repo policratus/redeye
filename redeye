@@ -18,7 +18,6 @@ def main():
 
     args = parse.construct_parser()
 
-
     if args.simple_mean_image:
         extractor.simple_mean_image(args.path)
     elif args.simple_eigen_images:
@@ -27,7 +26,10 @@ def main():
         file_list = image_basis.file_list(args.path)
 
         for ofile in file_list:
-            im_obj = image_basis.open_image(ofile)
+            if image_basis.is_this_type(ofile):
+                im_obj = image_basis.open_image(ofile)
+            else:
+                print 'File {file_name} in unexpected format. Skipping.'.format(file_name=ofile)
 
             if im_obj:
                 if args.colorspace:
@@ -78,8 +80,15 @@ def main():
                         ofile
                     )
                 elif args.dominant_colors:
-                    print ofile
                     extractor.dominant_colors(im_obj, args.dominant_colors)
+                elif args.corners:
+                    try:
+                        image_basis.save(
+                            extractor.simple_corner_detection(im_obj),
+                            ofile
+                        )
+                    except ValueError as value_error:
+                        print 'File {ffile}: {error}'.format(ffile=ofile, error=value_error)
 
 if __name__ == '__main__':
     main()
