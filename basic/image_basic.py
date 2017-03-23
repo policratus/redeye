@@ -49,19 +49,22 @@ class BasicImage(io.ImageIO):
             Number of colors or shades of grey
             to use
         """
-        if space == 'greyscale':
-            new_space = image.convert('L')
-        elif space == 'color':
-            new_space = image.convert(
-                'P',
-                dither=Image.NONE,
-                palette=Image.ADAPTIVE,
-                colors=size
-            ).convert('RGB')
-        else:
-            new_space = None
+        try:
+            if space == 'greyscale':
+                new_space = image.convert('L')
+            elif space == 'color':
+                new_space = image.convert(
+                    'RGB',
+                    dither=Image.NONE,
+                    palette=Image.ADAPTIVE,
+                    colors=size
+                )
+            else:
+                new_space = None
 
-        return new_space
+            return new_space
+        except ValueError:
+            raise ValueError('Problems when converting color space.')
 
     @staticmethod
     def thumbs(image, width, height):

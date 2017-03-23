@@ -117,6 +117,12 @@ class Parser(object):
             action='store_true'
         )
 
+        psh.add_argument(
+            '--corners',
+            help='Detect corners on image in a basic way',
+            action='store_true'
+        )
+
         fargs = psh.parse_args()
 
         return fargs

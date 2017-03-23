@@ -4,6 +4,8 @@ Contains basic operations related to files, images, etc
 import os
 import numpy
 from PIL import Image
+import magic
+import jellyfish
 from config import properties
 
 
@@ -11,12 +13,18 @@ class BasicIO(object):
     """
     Contains basic IO operations
     """
-    @staticmethod
-    def ls_dir(path):
+    @classmethod
+    def ls_dir(cls, path):
         """
         List directory contents
         """
-        return os.listdir(path)
+        files = os.listdir(path)
+
+        for ffile in files:
+            if cls.is_file(
+                    os.path.abspath(path) + '/' + ffile
+            ):
+                yield ffile
 
     @staticmethod
     def rm_file(filepath):
@@ -30,11 +38,46 @@ class BasicIO(object):
                 io_error
             )
 
+    @staticmethod
+    def mime_file(path):
+        """
+        Returns the mime type of passed file
+
+        Parameters
+        ----------
+        path: str
+            Path of file to discover mime type
+        """
+        magic_file = magic.Magic(mime=True, uncompress=True)
+
+        return magic_file.from_file(path)
+
+    @staticmethod
+    def is_file(path):
+        """
+        Tests if a passed path resolves to
+        a file or wherever else (like dirs)
+        """
+        return os.path.isfile(path)
+
+    @staticmethod
+    def extension(path):
+        """
+        Returns the last part of file
+        extension
+
+        Parameters
+        ----------
+        path: str
+            The path of file to return
+            the last extension
+        """
+        return os.path.splitext(path)[1].replace('.', '')
+
 class BasicFilesIO(BasicIO):
     """
     File utilities
     """
-
     @staticmethod
     def absolute_path(file_name, path):
         """
@@ -48,6 +91,8 @@ class BasicFilesIO(BasicIO):
         """
         if os.path.exists(path):
             working_dir = path
+        else:
+            raise IOError("File path doesn't exists")
 
         config = properties.Properties('Image')
         files = []
@@ -85,6 +130,27 @@ class BasicFilesIO(BasicIO):
         path, file_name = split_path[0], os.path.splitext(split_path[1])[0]
 
         return path + '/' + prefix + file_name + suffix + '.' + extension
+
+    @classmethod
+    def is_this_type(cls, path):
+        """
+        Verify if the mime type of file
+        is coherent to its extension
+
+        Parameters
+        ----------
+        path: str
+            Path where the file resides.
+        """
+        mime_type = cls.mime_file(path)
+        actual_type = mime_type.split('/')[1]
+
+        actual_extension = cls.extension(path)
+
+        return jellyfish.jaro_distance(
+            unicode(actual_type),
+            unicode(actual_extension)
+        ) >= 0.9
 
 class ImageIO(BasicFilesIO):
     """
@@ -154,6 +220,31 @@ class ImageIO(BasicFilesIO):
             Array representing image
         """
         return Image.fromarray(array)
+
+    @staticmethod
+    def matrix_of_ns(order, unity=0):
+        """
+        Return an square 2D array filled with specified
+        integer. Useful for kernels.
+
+        Parameters
+        ----------
+        order: int
+            Defining the order of the square matrix.
+        unity: int
+            Optional unity of array. By default, zero.
+        """
+        if isinstance(order, int) and \
+                isinstance(unity, int):
+            if unity == 0:
+                return numpy.zeros((order, order), dtype=numpy.int)
+            elif unity == 1:
+                return numpy.ones((order, order), dtype=numpy.int)
+            else:
+                array = numpy.zeros((order, order), dtype=numpy.int)
+                array.fill(unity)
+
+                return array
 
     @staticmethod
     def to_array(obj, array_type='uint8'):
