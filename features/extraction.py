@@ -195,8 +195,8 @@ class ExtractFeaturesImage(image_basic.FilterImage):
                     gray_image,
                     array_type='float32'
                 ),
-                blockSize=2,
-                ksize=3,
+                blockSize=20,
+                ksize=19,
                 k=0.04
             ),
             dilate_kernel
